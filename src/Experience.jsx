@@ -3,6 +3,7 @@ import { useFBO, OrbitControls, RoundedBox, useTexture, MeshTransmissionMaterial
 import { createPortal, useFrame, useThree } from "@react-three/fiber"
 import { DoubleSide, Scene } from "three"
 import { easing } from 'maath'
+import { Perf } from 'r3f-perf'
 
 
 export default function Experience(){
@@ -10,12 +11,36 @@ export default function Experience(){
   const [normalMap, pic] = useTexture(['./textures/waternormals.jpeg', './textures/colorcube_01.png'])
   console.log(pic)
 
+  const colorCube = useRef()
+
+  const colors = [0x00ff00, 0xff0000, 0x0000ff, 0x444, 0xffff00, 0xaaa];
+
   return (
     <>
+      <Perf position="top-left" />
       <OrbitControls />       
+      <mesh
+      ref={colorCube}
+      scale={10.}
+      position={[-30, 0, 5]}
+      >
+        <boxGeometry />
+        {colors.map((color, index) => (
+            <meshBasicMaterial
+              key={index}
+              attach={`material-${index}`}
+              color={color}
+            />
+          ))}
+      </mesh>
+
+      
+      
+      
         <Lens>
         <RoundedBox
-          radius={0.01}
+          radius={0.1}
+          scale={10.}
           >
           <meshStandardMaterial 
             metalness={1}
@@ -87,7 +112,7 @@ export default function Experience(){
             radius={0.005}
           >
           <MeshTransmissionMaterial 
-          // buffer={buffer.texture}
+          // buffer={buff0er.texture}
           roughness={0.2} 
           ior={1.2} 
           thickness={1.5} 
