@@ -6,13 +6,11 @@ import Experience from "./Experience";
 import './index.css'
 
 export default function App() {
-  
-  const [count, setCount] = useState(0)
 
  return (
 
   
-    <Canvas shadows camera={{ position: [3, 3, 3], fov: 40 }}>
+    <Canvas shadows camera={{ position: [0, 0, 50], fov: 40 }}>
       <Environment
         files="./Environments/envmap.hdr" />
         <color 
