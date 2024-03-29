@@ -8,7 +8,7 @@ import { Perf } from 'r3f-perf'
 
 export default function Experience(){
 
-  const [normalMap, pic] = useTexture(['./textures/waternormals.jpeg', './textures/colorcube_01.png'])
+  const [normalMap, pic] = useTexture(['./textures/broken_glass.jpg', './textures/colorcube_01.png'])
   const envMap = useEnvironment({files:'./environments/envmap.hdr'})
   console.log(pic)
 
@@ -33,8 +33,8 @@ export default function Experience(){
   )}
   
   export function Model(props) {
-    const { nodes } = useGLTF('./models/color_cube_separate_01.glb')
-    const [normalMap_01, normalMap_02] = useTexture(['./textures/waternormals.jpeg', './textures/Asphalt_1.jpg'])
+    const { nodes } = useGLTF('./models/shape_01.glb')
+    const [normalMap_01, normalMap_02] = useTexture(['./textures/broken_glass.jpg', './textures/Asphalt_1.jpg'])
     const modelRef = useRef()
     useFrame((state, delta) => {
       modelRef.current.rotation.x = modelRef.current.rotation.y += delta / 3
@@ -44,140 +44,34 @@ export default function Experience(){
       <>
     <group
       ref={modelRef}
-      position={[0, 0, 15]}
+      position={[0, 0, 10]}
     >
       <mesh castShadow receiveShadow
-      position={[0,0, -5]}
+      geometry={nodes.Shape.geometry}
+      position={[0,0, 0]}
       rotation={[0, Math.PI, 0]}
-      scale={10.}
+      scale={2.}
       >
-      <planeGeometry />
+
       <MeshTransmissionMaterial 
-          roughness={0.1} 
-          ior={1.4} 
-          thickness={0.01} 
-          anisotropy={0.1} 
-          chromaticAberration={0.5} 
-          color={0xffffff}
-          backside={false}
-          backsideThickness={0.5}
-          normalMap={normalMap_01}
-          normalScale={0.1}
-          side={DoubleSide}
-          />
-      </mesh>
-      <mesh
-        castShadow
-        receiveShadow
-        position={[5, 0, 0]}
-        rotation={[0, Math.PI / 2, 0]}
-        scale={10.}
-        >
-        <planeGeometry />
-        <MeshTransmissionMaterial 
-        roughness={0.1} 
-        ior={1.4} 
-        thickness={0.01} 
-        anisotropy={0.1} 
-        chromaticAberration={0.5} 
-        color={0xffffff}
-        backside={false}
-        normalMap={normalMap_01}
-        normalScale={0.1}
-        side={DoubleSide}
-        />
-      </mesh>
-      <mesh
-        castShadow
-        receiveShadow
-        position={[0, 0, 5]}
-        scale={10.}
-        >
-        <planeGeometry />
-        <MeshTransmissionMaterial 
-          roughness={0.1} 
-          ior={1.4} 
-          thickness={0.01} 
-          anisotropy={0.1} 
-          chromaticAberration={0.5} 
-          color={0xffffff}
-          backside={false}
-          normalMap={normalMap_01}
-          normalScale={0.1}
-          side={DoubleSide}
-          />
-      </mesh>
-      <mesh
-        castShadow
-        receiveShadow
-        position={[-5, 0, 0]}
-        rotation={[0, - Math.PI / 2, 0]}
-        scale={10.}
-        >
-        <planeGeometry />
-        <MeshTransmissionMaterial 
           roughness={0.4} 
           ior={1.4} 
-          thickness={0.5} 
-          anisotropy={0.1} 
-          chromaticAberration={0.04} 
-          color={0xffffff}
-          backside={false}
-          backsideThickness={0.5}
+          thickness={0.9} 
+          anisotropy={0.5} 
+          chromaticAberration={0.5} 
+          color={0xeeeeff}
+          backside={true}
+          backsideThickness={0.4}
           normalMap={normalMap_01}
-          normalScale={0.1}
+          normalScale={0.07}
           side={DoubleSide}
           />
-        </mesh>
-        <mesh
-        castShadow
-        receiveShadow
-        position={[0, -5, 0]}
-        rotation={[- Math.PI / 2, 0, 0]}
-        scale={10.}
-        >
-        <planeGeometry />
-        <MeshTransmissionMaterial 
-          roughness={0.1} 
-          ior={1.0} 
-          thickness={0.5} 
-          anisotropy={0.1} 
-          chromaticAberration={0.04} 
-          color={0xffffff}
-          backside={false}
-          backsideThickness={0.5}
-          normalMap={normalMap_01}
-          normalScale={0.1}
-          side={DoubleSide}
-          />
-        </mesh>
-        <mesh
-        castShadow
-        receiveShadow
-        position={[0, 5, 0]}
-        rotation={[Math.PI / 2, 0, 0]}
-        scale={10.}
-        >
-        <planeGeometry />
-        <MeshTransmissionMaterial 
-          roughness={0.1} 
-          ior={1.4} 
-          thickness={0.5} 
-          anisotropy={0.1} 
-          chromaticAberration={0.4} 
-          color={0xffffff}
-          backside={false}
-          backsideThickness={0.5}
-          normalMap={normalMap_01}
-          normalScale={0.1}
-          side={DoubleSide}
-          />
-        </mesh>
+      </mesh>
         </group>
         </>
     )
   }
 
-  useGLTF.preload('./models/color_cube.glb')
+  useGLTF.preload('./models/shape_01.glb')
   
   
