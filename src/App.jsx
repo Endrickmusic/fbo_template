@@ -15,7 +15,7 @@ export default function App() {
         files="./environments/envmap.hdr" />
         <color 
           attach="background" 
-          args={["#aaefef"]} />
+          args={["#e6cfcc"]} />
       <Experience />
     </Canvas>
   
