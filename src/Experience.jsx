@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { useFBO, OrbitControls, RoundedBox, useTexture, MeshTransmissionMaterial } from "@react-three/drei"
+import { useFBO, OrbitControls, RoundedBox, useTexture, MeshTransmissionMaterial, MeshRefractionMaterial, useEnvironment, useGLTF } from "@react-three/drei"
 import { createPortal, useFrame, useThree } from "@react-three/fiber"
 import { DoubleSide, Scene } from "three"
 import { easing } from 'maath'
@@ -9,11 +9,18 @@ import { Perf } from 'r3f-perf'
 export default function Experience(){
 
   const [normalMap, pic] = useTexture(['./textures/waternormals.jpeg', './textures/colorcube_01.png'])
+  const envMap = useEnvironment({files:'./environments/envmap.hdr'})
   console.log(pic)
 
   const colorCube = useRef()
+  const boxRef = useRef()
 
-  const colors = [0x00ff00, 0xff0000, 0x0000ff, 0x444, 0xffff00, 0xaaa];
+
+  const colors = [0x00ff00, 0xff0000, 0x0000ff, 0x444, 0xffff00, 0xaaa]
+
+  useFrame((state, delta) => {
+    boxRef.current.rotation.x = boxRef.current.rotation.y += delta / 3
+  })
 
   return (
     <>
@@ -23,22 +30,46 @@ export default function Experience(){
       ref={colorCube}
       scale={10.}
       position={[-30, 0, 5]}
+      visible={false}
       >
         <boxGeometry />
         {colors.map((color, index) => (
-            <meshBasicMaterial
+            <meshPhysicalMaterial
               key={index}
               attach={`material-${index}`}
               color={color}
+              roughness={0.1}
+              metalness={0.0}
+              transmission={1.0}
+              opacity={1.0}
+              thickness={5.0}
+              envMap={envMap}
             />
           ))}
       </mesh>
 
+      <Model />
+
+      <mesh
+      visible={false}
+      scale={8.}
+      position={[20, 10, 30]}
+      ref={boxRef}
+      >
+        <boxGeometry />
+        <MeshTransmissionMaterial 
+          envMap={envMap}
+          roughness={0.2} 
+          ior={1.2} 
+          thickness={1.5} 
+          anisotropy={0.1} 
+          chromaticAberration={0.04} 
+        />
+      </mesh>
       
-      
-      
-        <Lens>
+        {/* <Lens> */}
         <RoundedBox
+        visible={false}
           radius={0.1}
           scale={10.}
           >
@@ -59,11 +90,14 @@ export default function Experience(){
         map={pic} />
        </mesh>
 
-       </Lens>
+       {/* </Lens> */}
     </>
   )}
 
   function Lens({ children, damping = 0.15, ...props }) {
+
+    
+    const colors = [0x00ff00]
     const ref = useRef()
     const buffer = useFBO()
     const viewport = useThree((state) => state.viewport)
@@ -101,30 +135,180 @@ export default function Experience(){
           color={0xeeeeff}
           />
         </mesh>
-        {/* <mesh 
+
+        <mesh 
+        visible={false}
         scale={10.} 
         ref={ref} 
         rotation={[Math.PI / 4, Math.PI / .1 , Math.PI / 2.9 ]} 
-        {...props}> */}
-          <RoundedBox
-            scale={10.}          
-            ref={ref} 
-            radius={0.005}
-          >
+        >
+          <boxGeometry />
+        
           <MeshTransmissionMaterial 
-          // buffer={buff0er.texture}
+          // buffer={buffer.texture}
           roughness={0.2} 
           ior={1.2} 
           thickness={1.5} 
           anisotropy={0.1} 
           chromaticAberration={0.04} 
-          // color={0x9999ee}
+          attach={`material-1`}
           // distortion={0.1}
           backside={true}
           backsideThickness={0.5}
           />
-          </RoundedBox>
-        {/* </mesh> */}
+        </mesh>
       </>
     )
   }
+  
+  export function Model(props) {
+    const { nodes } = useGLTF('./models/color_cube_separate_01.glb')
+    const [normalMap_01, normalMap_02] = useTexture(['./textures/waternormals.jpeg', './textures/Asphalt_1.jpg'])
+    const modelRef = useRef()
+    useFrame((state, delta) => {
+      modelRef.current.rotation.x = modelRef.current.rotation.y += delta / 3
+    })
+
+    return (
+      <>
+    <group
+      ref={modelRef}
+      position={[0, 0, 15]}
+    >
+      <mesh castShadow receiveShadow
+      position={[0,0, -5]}
+      rotation={[0, Math.PI, 0]}
+      scale={10.}
+      >
+      <planeGeometry />
+      <MeshTransmissionMaterial 
+          roughness={0.1} 
+          ior={1.8} 
+          thickness={0.5} 
+          anisotropy={1.0} 
+          chromaticAberration={1.00} 
+          color={0xffffff}
+          backside={false}
+          backsideThickness={0.5}
+          normalMap={normalMap_01}
+          normalScale={0.01}
+          side={DoubleSide}
+          />
+      </mesh>
+      <mesh
+        castShadow
+        receiveShadow
+        position={[5, 0, 0]}
+        rotation={[0, Math.PI / 2, 0]}
+        scale={10.}
+        >
+        <planeGeometry />
+        <MeshTransmissionMaterial 
+        roughness={0.1} 
+        ior={1.6} 
+        thickness={0.5} 
+        anisotropy={0.1} 
+        chromaticAberration={0.04} 
+        color={0xffffee}
+        backside={false}
+        backsideThickness={0.5}
+        normalMap={normalMap_01}
+        normalScale={0.01}
+        side={DoubleSide}
+        />
+      </mesh>
+      <mesh
+        castShadow
+        receiveShadow
+        position={[0, 0, 5]}
+        scale={10.}
+        >
+        <planeGeometry />
+        <MeshTransmissionMaterial 
+          roughness={0.1} 
+          ior={1.4} 
+          thickness={0.01} 
+          anisotropy={0.1} 
+          chromaticAberration={0.9} 
+          color={0xffeeee}
+          backside={false}
+          backsideThickness={0.0}
+          normalMap={normalMap_01}
+          normalScale={0.01}
+          side={DoubleSide}
+          />
+      </mesh>
+      <mesh
+        castShadow
+        receiveShadow
+        position={[-5, 0, 0]}
+        rotation={[0, - Math.PI / 2, 0]}
+        scale={10.}
+        >
+        <planeGeometry />
+        <MeshTransmissionMaterial 
+          roughness={0.4} 
+          ior={1.0} 
+          thickness={0.5} 
+          anisotropy={0.1} 
+          chromaticAberration={0.04} 
+          color={0xeeeeff}
+          backside={false}
+          backsideThickness={0.5}
+          normalMap={normalMap_01}
+          normalScale={0.4}
+          side={DoubleSide}
+          />
+        </mesh>
+        <mesh
+        castShadow
+        receiveShadow
+        position={[0, -5, 0]}
+        rotation={[- Math.PI / 2, 0, 0]}
+        scale={10.}
+        >
+        <planeGeometry />
+        <MeshTransmissionMaterial 
+          roughness={0.4} 
+          ior={1.0} 
+          thickness={0.5} 
+          anisotropy={0.1} 
+          chromaticAberration={0.04} 
+          color={0xeeeeff}
+          backside={false}
+          backsideThickness={0.5}
+          normalMap={normalMap_01}
+          normalScale={0.4}
+          side={DoubleSide}
+          />
+        </mesh>
+        <mesh
+        castShadow
+        receiveShadow
+        position={[0, 5, 0]}
+        rotation={[Math.PI / 2, 0, 0]}
+        scale={10.}
+        >
+        <planeGeometry />
+        <MeshTransmissionMaterial 
+          roughness={0.4} 
+          ior={1.0} 
+          thickness={0.5} 
+          anisotropy={0.1} 
+          chromaticAberration={0.04} 
+          color={0xeeeeff}
+          backside={false}
+          backsideThickness={0.5}
+          normalMap={normalMap_01}
+          normalScale={0.4}
+          side={DoubleSide}
+          />
+        </mesh>
+        </group>
+        </>
+    )
+  }
+
+  useGLTF.preload('./models/color_cube.glb')
+  
+  
